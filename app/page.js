@@ -24,7 +24,6 @@ export default function HomePage() {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    setLoading(true)
     // 1게시판: 편집자+회원 글 중 추천수가 많은 글
     fetch('/api/posts?sort=popular')
       .then(r => r.json())

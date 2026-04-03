@@ -12,11 +12,6 @@ function formatDate(str) {
   return d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' }).replace('. ', '/').replace('.', '')
 }
 
-function joinDate(iso) {
-  if (!iso) return ''
-  return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
-}
-
 const TABS = ['내가 쓴 글', '내가 쓴 댓글']
 
 export default function MePage() {
@@ -25,7 +20,7 @@ export default function MePage() {
   const [loading, setLoading] = useState(true)
   const [tab,     setTab]     = useState(0)
   const [posts,   setPosts]   = useState([])
-  const [postsLoading, setPostsLoading] = useState(false)
+  const [postsLoading, setPostsLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -39,7 +34,6 @@ export default function MePage() {
 
   useEffect(() => {
     if (!user) return
-    setPostsLoading(true)
     fetch('/api/auth/my-posts')
       .then(r => r.json())
       .then(d => {

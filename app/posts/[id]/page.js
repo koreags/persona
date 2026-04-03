@@ -28,7 +28,7 @@ export default function PostPage() {
     fetch(`/api/posts/${id}/view`, { method: 'POST' })
 
     const stored = localStorage.getItem(`liked_${id}`)
-    if (stored) setLiked(true)
+    if (stored) queueMicrotask(() => setLiked(true))
 
     // 로그인 정보 + 관리자 여부
     fetch('/api/auth/me')

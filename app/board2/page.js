@@ -24,7 +24,6 @@ export default function Board2Page() {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    setLoading(true)
     fetch('/api/user-posts')
       .then(r => r.json())
       .then(data => { setPosts(Array.isArray(data) ? data : []); setLoading(false) })
