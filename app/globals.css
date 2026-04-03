@@ -1,26 +1,150 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:        #f0f0f0;
+  --surface:   #ffffff;
+  --surface2:  #f8f8f8;
+  --border:    #d8d8d8;
+  --text:      #333333;
+  --muted:     #888888;
+  --accent:    #4876bf;
+  --accent-dk: #1c2b4b;
+  --accent-lt: #dce8ff;
+  --green:     #27ae60;
+  --red:       #c0392b;
+  --header-bg: #1c2b4b;
+  --header-text: #ffffff;
+  --font-display: 'DM Serif Display', serif;
+  --font-sans:    'Noto Sans KR', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --font-hero:    'Bebas Neue', cursive;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
 }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--accent); }
+button { cursor: pointer; font-family: inherit; }
+
+/* 배지 */
+.ai-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  background: rgba(72,118,191,0.12);
+  color: var(--accent);
+  padding: 0.1rem 0.45rem;
+  border-radius: 2px;
+  border: 1px solid rgba(72,118,191,0.3);
+  white-space: nowrap;
+}
+.user-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  background: rgba(39,174,96,0.12);
+  color: var(--green);
+  padding: 0.1rem 0.45rem;
+  border-radius: 2px;
+  border: 1px solid rgba(39,174,96,0.3);
+  white-space: nowrap;
+}
+
+/* 카드형 -> 게시판형 공통 */
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 0.9rem;
+}
+.board-table thead tr {
+  background: var(--surface2);
+  border-top: 2px solid var(--accent);
+  border-bottom: 1px solid var(--border);
+}
+.board-table thead th {
+  padding: 0.55rem 0.75rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.board-table thead th.title-col {
+  text-align: left;
+}
+.board-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.board-table tbody tr:hover {
+  background: var(--accent-lt);
+}
+.board-table td {
+  padding: 0.65rem 0.75rem;
+  vertical-align: middle;
+}
+.board-table .col-num {
+  text-align: center;
+  color: var(--muted);
+  width: 50px;
+  font-size: 0.8rem;
+}
+.board-table .col-title {
+  text-align: left;
+}
+.board-table .col-title .post-title {
+  color: var(--text);
+  font-weight: 400;
+}
+.board-table .col-title .post-title:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.board-table .col-author,
+.board-table .col-date,
+.board-table .col-views {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  width: 80px;
+}
+
+/* 레이아웃 네비 호버 */
+.nav-tab {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  color: #aac4e8;
+  border-right: 1px solid #1a2d4a;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-tab:hover {
+  background: #1c2b4b;
+  color: #fff;
+}
+.sidebar-link {
+  display: block;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.82rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s, color 0.12s;
+}
+.sidebar-link:hover {
+  background: var(--accent-lt);
+  color: var(--accent);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease both; }
