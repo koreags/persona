@@ -1,29 +1,36 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { createAdminClient } from '../../../../../lib/supabase'
 
 export async function POST(req, context) {
   const { id } = await context.params
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  )
+  const cookieStore = await cookies()
+  const isAdmin = cookieStore.get('admin_auth')?.value === '1'
 
-  // 현재 like_count 조회 후 +1
-  const { data: post, error: fetchErr } = await supabase
+  const admin = createAdminClient()
+
+  const { data: post, error: fetchErr } = await admin
     .from('posts')
     .select('like_count')
     .eq('id', id)
-    .eq('status', 'published')
     .single()
 
-  if (fetchErr || !post) return NextResponse.json({ error: 'not found' }, { status: 404 })
+  if (fetchErr || !post) {
+    console.error('[like] fetch error:', fetchErr?.message, 'id:', id)
+    return NextResponse.json({ error: 'not found' }, { status: 404 })
+  }
 
   const newCount = (post.like_count || 0) + 1
-  const { error: updateErr } = await supabase
+
+  const { error: updateErr } = await admin
     .from('posts')
     .update({ like_count: newCount })
     .eq('id', id)
 
-  if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+  if (updateErr) {
+    console.error('[like] update error:', updateErr.message)
+    return NextResponse.json({ error: updateErr.message }, { status: 500 })
+  }
+
   return NextResponse.json({ like_count: newCount })
 }

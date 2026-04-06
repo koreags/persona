@@ -40,16 +40,28 @@ export default function PostPage() {
   }, [id])
 
   async function handleLike() {
-    if (liked || liking) return
+    if (liking) return
+    if (!isAdmin && liked) return   // 일반 사용자: 1회 제한
     setLiking(true)
-    const res = await fetch(`/api/posts/${id}/like`, { method: 'POST' })
-    const data = await res.json()
-    if (!data.error) {
-      setLikeCount(data.like_count)
-      setLiked(true)
-      localStorage.setItem(`liked_${id}`, '1')
+    try {
+      const res = await fetch(`/api/posts/${id}/like`, { method: 'POST' })
+      const data = await res.json()
+      console.log('[like] status:', res.status, 'body:', data)
+      if (data.error) {
+        console.warn('[like] API error:', data.error)
+        alert('추천 실패: ' + data.error)
+      } else {
+        setLikeCount(data.like_count)
+        if (!isAdmin) {
+          setLiked(true)
+          localStorage.setItem(`liked_${id}`, '1')
+        }
+      }
+    } catch (err) {
+      console.error('[like] fetch failed:', err)
+    } finally {
+      setLiking(false)
     }
-    setLiking(false)
   }
 
   async function handleDelete() {
@@ -155,7 +167,7 @@ export default function PostPage() {
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem', display: 'flex', justifyContent: 'center' }}>
           <button
             onClick={handleLike}
-            disabled={liked || liking}
+            disabled={(!isAdmin && liked) || liking}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem',
               padding: '0.6rem 2rem',

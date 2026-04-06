@@ -1,6 +1,7 @@
 import './globals.css'
 import Link from 'next/link'
 import HeaderAuth from './components/HeaderAuth'
+import VisitTracker from './components/VisitTracker'
 import { cookies } from 'next/headers'
 
 export const metadata = {
@@ -14,6 +15,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body>
+        <VisitTracker />
         {/* ── 최상단 헤더 ── */}
         <header style={{
           background: 'var(--header-bg)',

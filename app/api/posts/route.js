@@ -35,5 +35,7 @@ export async function GET(req) {
     result = all
   }
 
-  return NextResponse.json(result)
+  return NextResponse.json(result, {
+    headers: { 'Cache-Control': 'no-store' },
+  })
 }

@@ -22,12 +22,17 @@ export default function HomePage() {
   const [posts, setPosts] = useState([])
   const [persons, setPersons] = useState([])
   const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => {})
+  }, [])
 
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      fetch(`/api/posts?board=${tab}`).then(r => r.json()).catch(() => []),
-      fetch('/api/persons').then(r => r.json()).catch(() => []),
+      fetch(`/api/posts?board=${tab}`, { cache: 'no-store' }).then(r => r.json()).catch(() => []),
+      fetch('/api/persons', { cache: 'no-store' }).then(r => r.json()).catch(() => []),
     ]).then(([postsData, personsData]) => {
       setPosts(Array.isArray(postsData) ? postsData : [])
       setPersons(Array.isArray(personsData) ? personsData : [])
@@ -136,12 +141,16 @@ export default function HomePage() {
                   ? { color: 'var(--accent)', borderColor: 'rgba(72,118,191,0.4)', background: 'var(--accent-lt)' }
                   : { color: '#888', borderColor: '#ddd', background: '#f9f9f9' }),
               }}>
-                {p.post_type === 'ai' ? 'AI요약' : '독자투고'}
+                {p.post_type === 'ai' ? '관리자 게시' : '독자투고'}
               </span>
 
-              {/* 날짜 */}
-              <span style={{ fontSize: '0.72rem', color: 'var(--muted)', flexShrink: 0, minWidth: '3rem', textAlign: 'right' }}>
-                {formatDate(p.published_at)}
+              {/* 조회·추천·날짜 */}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0, fontSize: '0.72rem', color: 'var(--muted)' }}>
+                <span>👁 {p.view_count ?? 0}</span>
+                <span style={{ color: (p.like_count ?? 0) > 0 ? '#c0392b' : 'var(--muted)' }}>
+                  👍 {p.like_count ?? 0}
+                </span>
+                <span style={{ minWidth: '3rem', textAlign: 'right' }}>{formatDate(p.published_at)}</span>
               </span>
             </div>
           ))}
@@ -149,36 +158,68 @@ export default function HomePage() {
       </div>
 
       {/* 사이드바 */}
-      {persons.length > 0 && (
-        <aside style={{
-          width: '160px',
-          flexShrink: 0,
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '4px',
-          overflow: 'hidden',
-        }}>
+      <aside style={{ width: '160px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+
+        {/* 방문자 수 */}
+        {stats && (
           <div style={{
-            background: 'var(--accent-dk)',
-            color: '#fff',
-            padding: '0.45rem 0.75rem',
-            fontSize: '0.78rem',
-            fontWeight: 600,
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '4px',
+            overflow: 'hidden',
           }}>
-            인물
-          </div>
-          {persons.map((person, i) => (
-            <div key={person.id ?? person.name ?? i} style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>
-              <Link
-                href={`/persons/${person.id ?? person.slug ?? ''}`}
-                style={{ display: 'block', padding: '0.45rem 0.75rem', fontSize: '0.8rem', color: 'var(--text)', textDecoration: 'none' }}
-              >
-                {person.name}
-              </Link>
+            <div style={{
+              background: 'var(--accent-dk)',
+              color: '#fff',
+              padding: '0.45rem 0.75rem',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+            }}>
+              방문자
             </div>
-          ))}
-        </aside>
-      )}
+            <div style={{ padding: '0.5rem 0.75rem', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
+                <span>오늘</span>
+                <span style={{ color: 'var(--text)', fontWeight: 500 }}>{(stats.today_visits ?? 0).toLocaleString()}명</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted)' }}>
+                <span>누적</span>
+                <span style={{ color: 'var(--text)', fontWeight: 500 }}>{(stats.total_visits ?? 0).toLocaleString()}명</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 인물 목록 */}
+        {persons.length > 0 && (
+          <div style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              background: 'var(--accent-dk)',
+              color: '#fff',
+              padding: '0.45rem 0.75rem',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+            }}>
+              인물
+            </div>
+            {persons.map((person, i) => (
+              <div key={person.id ?? person.name ?? i} style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border)' }}>
+                <Link
+                  href={`/persons/${person.id ?? person.slug ?? ''}`}
+                  style={{ display: 'block', padding: '0.45rem 0.75rem', fontSize: '0.8rem', color: 'var(--text)', textDecoration: 'none' }}
+                >
+                  {person.name}
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </aside>
     </div>
   )
 }
